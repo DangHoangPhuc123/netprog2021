@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
 	IP = (struct in_addr **)gethost -> h_addr_list;
 
 	for(int i=0; IP[i] != NULL; i++){
-		printf("%s\n", inet_ntoa(*IP[i]));
+		printf("IP address found: %s\n", inet_ntoa(*IP[i]));
 	}
 
 	return 0;
