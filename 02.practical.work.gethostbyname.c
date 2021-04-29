@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
 	}
 	else if(argc == 2)
 	{
-		char *hostname = argv[1];
+		const char *hostname = argv[1];
 	}
 	else if(argc > 2)
 	{
@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
 	struct in_addr **IP;
 	IP = (struct in_addr **)gethost -> h_addr_list;
 
-	for(int i=0; IP[i] != NULL; i++){
+	for(unsigned int i=0; IP[i] != NULL; i++){
 		printf("IP address found: %s\n", inet_ntoa(*IP[i]));
 	}
 
