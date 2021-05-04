@@ -37,6 +37,5 @@ int main (int argc, char **argv) {
     }
 
     printf("There's a client want to connect!\n");
-
-	return 0;
+    return -1;
 }
