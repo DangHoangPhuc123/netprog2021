@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
         memset(sever, 0, 1000);
         printf("Client> ");
         fgets(sever, 200, stdin);
-        write(sockfd, sever, strlen(s));
+        write(sockfd, sever, strlen(sever));
         read(sockfd, sever, 1000);
         s[strlen(sever)] = 0;
         printf("Server says: %s\n", sever);
