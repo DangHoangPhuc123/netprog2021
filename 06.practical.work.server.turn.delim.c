@@ -45,11 +45,11 @@ int main (int argc, char **argv) {
         fgets(buffer,255,stdin);
         n = write(sockfd,buffer,strlen(buffer));
         if (n < 0)
-            error("ERROR writing to socket");
+            printf("cannot write to socket");
         bzero(buffer,256);
         n = read(sockfd,buffer,255);
         if (n < 0)
-            error("ERROR reading from socket");
+            printf("cannot read from socket");
         printf("%s\n",buffer);
     }
     return 0;
