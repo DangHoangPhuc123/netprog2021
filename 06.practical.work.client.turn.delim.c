@@ -9,7 +9,7 @@
 int main(int argc, char const *argv[])
 {
     char hostname[256];
-
+    int sockfd, test;
     if(argc == 1){
         printf("Enter a hostname: ");
         scanf("%s", hostname);
@@ -32,21 +32,19 @@ int main(int argc, char const *argv[])
 
     struct hostent *gethost = gethostbyname(hostname);
     struct in_addr **IP;
+    
+    if (gethost == NULL) {
+        printf("The host not found\n");
+        exit(1);
+    }
     IP = (struct in_addr **)gethost -> h_addr_list;
 
     for(unsigned int i=0; IP[i] != NULL; i++){
         printf("IP address found: %s\n", inet_ntoa(*IP[i]));
     }
 
-    int sockfd;
-
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("Something wrong cannot creating socket\n");
-        exit(1);
-    }
-
-    if ((gethost = gethostbyname("ict.usth.edu.vn")) == NULL) {
-        printf("The host not found\n");
         exit(1);
     }
 
@@ -60,7 +58,7 @@ int main(int argc, char const *argv[])
         printf("We cannot connect\n");
         exit(1);
     }
-    printf("Error accepting connection\n");
+
     while (1) {
         bzero(buffer, sizeof(buffer));
         fgets(buffer, sizeof(buffer), stdin);
@@ -70,13 +68,12 @@ int main(int argc, char const *argv[])
         else
             printf("can't write to socket\n");
         bzero(buffer, sizeof(buffer));
-        try = read(sockfd, buffer ,sizeof(buffer));
-        if (try >= 0)
+        test = read(sockfd, buffer ,sizeof(buffer));
+        if (test >= 0)
             printf("can read from socket\n");
         else
             printf("cannot read from socket\n");
         printf("finish  %s\n", buffer);
-        return 0;
     }
     return 0;
 }
