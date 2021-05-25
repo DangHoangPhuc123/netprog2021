@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 int main (int argc, char **argv) {
-    int sockfd, clen, clientfd;
+    int sockfd, clen, clientfd, test;
     struct sockaddr_in saddr, caddr;
     unsigned short port = 8784;
 
@@ -43,13 +43,17 @@ int main (int argc, char **argv) {
         printf("Please enter the message: ");
         bzero(buffer,256);
         fgets(buffer,255,stdin);
-        n = write(sockfd,buffer,strlen(buffer));
-        if (n < 0)
-            printf("cannot write to socket");
+        test = write(sockfd,buffer,strlen(buffer));
+        if (test >= 0)
+            printf("can write to socket\n");
+        else
+            printf("can't write to socket\n");
         bzero(buffer,256);
-        n = read(sockfd,buffer,255);
-        if (n < 0)
-            printf("cannot read from socket");
+        test = read(sockfd,buffer,255);
+        if (test >= 0)
+            printf("can read from socket\n");
+        else
+            printf("cannot read from socket\n");
         printf("%s\n",buffer);
     }
     return 0;
