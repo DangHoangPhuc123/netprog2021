@@ -7,7 +7,8 @@
 #include <unistd.h>
 
 int main (int argc, char **argv) {
-    int sockfd, clen, clientfd, test;
+    int sockfd, clientfd, test, buffer;
+    socklen_t clen;
     struct sockaddr_in saddr, caddr;
     unsigned short port = 8784;
 
@@ -41,7 +42,7 @@ int main (int argc, char **argv) {
     printf("There's a client want to connect!\n");
     while (1) {
         printf("Please enter the message: ");
-        bzero(buffer,256);
+        bzero(buffer, 256);
         fgets(buffer,255,stdin);
         test = write(sockfd,buffer,strlen(buffer));
         if (test >= 0)
@@ -56,7 +57,7 @@ int main (int argc, char **argv) {
             printf("cannot read from socket\n");
         printf("%s\n",buffer);
         
-        if (strcmp(buffer, "/quit", 5) == 0) {
+        if (strcmp(buffer, "/quit") == 0) {
             printf("disconnected server\n");
             shutdown(sockfd, SHUT_RDWR);
             close(sockfd);
