@@ -6,80 +6,62 @@
 #include <errno.h>
 #include <unistd.h>
 
-int main(int argc, char const *argv[])
-{
-    char hostname[256];
-    int sockfd, test;
-    if(argc == 1){
-        printf("Enter a hostname: ");
-        scanf("%s", hostname);
+int main (int argc, char **argv) {
+    int sockfd, clen, clientfd, test;
+    struct sockaddr_in saddr, caddr;
+    unsigned short port = 8784;
 
-    }
-    else if(argc == 2)
-    {
-        const char *hostname = argv[1];
-    }
-    else if(argc > 2)
-    {
-        printf("There are too many results! \n");
-        exit(-1);
-    }
-    else if(argc < 2)
-    {
-        printf("I checked it, but found nothing.\n");
-        exit(1);
+    if ((sockfd=socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf ("Error creating socket\n");
+        return -1;
     }
 
-    struct hostent *gethost = gethostbyname(hostname);
-    struct in_addr **IP;
-
-    if (gethost == NULL) {
-        printf("The host not found\n");
-        exit(1);
-    }
-    IP = (struct in_addr **)gethost -> h_addr_list;
-
-    for(unsigned int i=0; IP[i] != NULL; i++){
-        printf("IP address found: %s\n", inet_ntoa(*IP[i]));
-    }
-
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("Something wrong cannot creating socket\n");
-        exit(1);
-    }
-
-    struct sockaddr_in saddr;
     memset(&saddr, 0, sizeof(saddr));
     saddr.sin_family = AF_INET;
-    memcpy((char *) &saddr.sin_addr.s_addr, gethost->h_addr_list[0], gethost->h_length);
-    saddr.sin_port = htons(8784);
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    saddr.sin_port = htons(port);
 
-    if (connect(sockfd, (struct sockaddr *) &saddr, sizeof(saddr)) < 0) {
-        printf("We cannot connect\n");
-        exit(1);
+    if ((bind(sockfd, (struct sockaddr *) &saddr, sizeof(saddr)) < 0)) {
+        printf("Error binding\n");
+        return -1;
     }
 
+    if (listen(sockfd, 5) < 0) {
+        printf("Error listening\n");
+        return -1;
+    }
+
+    clen =sizeof(caddr);
+
+    if ((clientfd=accept(sockfd, (struct sockaddr *) &caddr, &clen)) < 0) {
+        printf("Error accepting connection\n");
+        return -1;
+    }
+
+    printf("There's a client want to connect!\n");
     while (1) {
-        bzero(buffer, sizeof(buffer));
-        fgets(buffer, sizeof(buffer), stdin);
-        test = write(sockfd, buffer, strlen(buffer));
+        printf("Please enter the message: ");
+        bzero(buffer,256);
+        fgets(buffer,255,stdin);
+        test = write(sockfd,buffer,strlen(buffer));
         if (test >= 0)
             printf("can write to socket\n");
         else
             printf("can't write to socket\n");
-        bzero(buffer, sizeof(buffer));
-        test = read(sockfd, buffer ,sizeof(buffer));
+        bzero(buffer,256);
+        test = read(sockfd,buffer,255);
         if (test >= 0)
             printf("can read from socket\n");
         else
             printf("cannot read from socket\n");
-        printf("finish  %s\n", buffer);
+        printf("%s\n",buffer);
+        
         if (strcmp(buffer, "/quit", 5) == 0) {
-            printf("Client disconnected\n");
+            printf("disconnected server\n");
             shutdown(sockfd, SHUT_RDWR);
             close(sockfd);
             return 0;
+        }
     }
     return 0;
 }
-
