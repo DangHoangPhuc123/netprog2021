@@ -34,20 +34,23 @@ int main (int argc, char **argv) {
     }
     clen =sizeof(caddr);
 
-    if ((clientfd=accept(sockfd, (struct sockaddr *) &caddr, &clen)) < 0) {
+    clientfd = accept(sockfd, (struct sockaddr *) &caddr, &clen)
+
+    int fl = fcntl(clientfd, F_GETFL, 0);
+    fl |= O_NONBLOCK;
+    fcntl(clientfd, F_SETFL, fl);
+
+    if (clientfd < 0) {
         printf("Error accepting connection\n");
         return -1;
     }
 
     printf("There's a client want to connect!\n");
 
-    int fl = fcntl(sockfd, F_GETFL, 0);
-    fl |= O_NONBLOCK;
-    fcntl(sockfd, F_SETFL, fl);
     while (1) {
         char buffer[200];
         memset(buffer, 0, 200);
-        if (read(sockfd, buffer, 200) > 0) {
+        if (read(clientfd, buffer, 200) > 0) {
             printf("Server says: %s\n", buffer);
         }
         const int POLLIN;
@@ -55,7 +58,7 @@ int main (int argc, char **argv) {
         if (poll(input, 1, 100) > 0) {
             fgets(buffer, 200, stdin);
             buffer[strlen(buffer)] = 0;
-            write(sockfd, buffer, strlen(buffer));
+            write(clientfd, buffer, strlen(buffer));
         }
     }
     return 0;
